@@ -27,7 +27,7 @@ jobs:
     - name: Install dependencies
       run: |
         pip install pyinstaller
-        pip install pandas openpyxl
+        pip install tkcalendar pandas openpyxl
 
     - name: Build executable
       run: pyinstaller --onefile schedule_app.py
