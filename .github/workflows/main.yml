@@ -31,7 +31,7 @@ jobs:
 
     - name: Build executable
       run: |
-        pyinstaller --onefile --debug --hidden-import=babel.numbers schedule_app.py
+        pyinstaller --onefile --hidden-import=babel.numbers schedule_app.py
 
     - name: Upload artifact
       uses: actions/upload-artifact@v2
