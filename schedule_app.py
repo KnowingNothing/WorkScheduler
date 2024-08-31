@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
-import csv
+import pandas as pd
 from datetime import datetime, timedelta
 from collections import defaultdict
 
@@ -46,10 +46,11 @@ english_to_chinese_weekday = {
 # 读取教师信息
 def read_teachers(file_path):
     teachers = {}
-    with open(file_path, 'r', encoding='utf-8') as file:
-        for line in file:
-            name, days = line.strip().split(' ', 1)
-            teachers[name] = [weekday_map[day] for day in days.split('、')]
+    df = pd.read_excel(file_path)
+    for index, row in df.iterrows():
+        name = row['姓名']
+        days = row['可值班日'].split('、')
+        teachers[name] = [weekday_map[day] for day in days]
     return teachers
 
 # 生成日期范围
@@ -88,20 +89,18 @@ def generate_schedule(teachers, start_date, end_date):
 
     return schedule, teacher_stats
 
-# 写入CSV文件
-def write_schedule_to_csv(schedule, output_file):
-    with open(output_file, 'w', newline='', encoding='utf-8') as csvfile:
-        csvwriter = csv.writer(csvfile)
-        csvwriter.writerow(['日期', '星期', '人名'])
-        csvwriter.writerows(schedule)
+# 写入Excel文件
+def write_schedule_to_excel(schedule, output_file):
+    df = pd.DataFrame(schedule, columns=['日期', '星期', '人名'])
+    df.to_excel(output_file, index=False)
 
-# 写入教师统计信息到CSV文件
-def write_teacher_stats_to_csv(teacher_stats, output_file):
-    with open(output_file, 'w', newline='', encoding='utf-8') as csvfile:
-        csvwriter = csv.writer(csvfile)
-        csvwriter.writerow(['教师姓名', '排班天数', '排班日期'])
-        for teacher, stats in teacher_stats.items():
-            csvwriter.writerow([teacher, stats['count'], '、'.join(stats['days'])])
+# 写入教师统计信息到Excel文件
+def write_teacher_stats_to_excel(teacher_stats, output_file):
+    data = []
+    for teacher, stats in teacher_stats.items():
+        data.append((teacher, stats['count'], '、'.join(stats['days'])))
+    df = pd.DataFrame(data, columns=['教师姓名', '排班天数', '排班日期'])
+    df.to_excel(output_file, index=False)
 
 # Tkinter UI
 class ScheduleApp(tk.Tk):
@@ -123,7 +122,7 @@ class ScheduleApp(tk.Tk):
         self.generate_button.pack()
 
     def browse_file(self):
-        file_path = filedialog.askopenfilename(filetypes=[("Text files", "*.txt")])
+        file_path = filedialog.askopenfilename(filetypes=[("Excel files", "*.xlsx")])
         self.input_file_entry.delete(0, tk.END)
         self.input_file_entry.insert(0, file_path)
 
@@ -138,10 +137,10 @@ class ScheduleApp(tk.Tk):
             start_date = datetime(2024, 9, 2)
             end_date = datetime(2025, 1, 11)
             schedule, teacher_stats = generate_schedule(teachers, start_date, end_date)
-            schedule_output_file = "schedule_night.csv"
-            stats_output_file = "teacher_stats_night.csv"
-            write_schedule_to_csv(schedule, schedule_output_file)
-            write_teacher_stats_to_csv(teacher_stats, stats_output_file)
+            schedule_output_file = "schedule_night.xlsx"
+            stats_output_file = "teacher_stats_night.xlsx"
+            write_schedule_to_excel(schedule, schedule_output_file)
+            write_teacher_stats_to_excel(teacher_stats, stats_output_file)
             messagebox.showinfo("成功", "排班生成成功，文件已保存")
         except Exception as e:
             messagebox.showerror("错误", f"生成排班时出错: {e}")
