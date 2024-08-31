@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
-from tkcalendar import Calendar
+from tkcalendar import DateEntry
 import pandas as pd
 from datetime import datetime, timedelta
 from collections import defaultdict
@@ -122,16 +122,16 @@ class ScheduleApp(tk.Tk):
         self.browse_button = tk.Button(self, text="浏览", command=self.browse_file)
         self.browse_button.pack()
 
-        self.start_date_label = tk.Label(self, text="起始日期 (YYYY-MM-DD):")
+        self.start_date_label = tk.Label(self, text="起始日期:")
         self.start_date_label.pack()
 
-        self.start_date_entry = tk.Entry(self, width=40)
+        self.start_date_entry = DateEntry(self, width=40, date_pattern='yyyy-mm-dd')
         self.start_date_entry.pack()
 
-        self.end_date_label = tk.Label(self, text="结束日期 (YYYY-MM-DD):")
+        self.end_date_label = tk.Label(self, text="结束日期:")
         self.end_date_label.pack()
 
-        self.end_date_entry = tk.Entry(self, width=40)
+        self.end_date_entry = DateEntry(self, width=40, date_pattern='yyyy-mm-dd')
         self.end_date_entry.pack()
 
         self.holidays_label = tk.Label(self, text="节假日:")
@@ -195,13 +195,13 @@ class ScheduleApp(tk.Tk):
     def select_date(self, title):
         top = tk.Toplevel(self)
         top.title(title)
-        cal = Calendar(top, selectmode='day', date_pattern='yyyy-mm-dd')
-        cal.pack(pady=20)
+        date_entry = DateEntry(top, width=20, date_pattern='yyyy-mm-dd')
+        date_entry.pack(pady=20)
         date = None
 
         def on_select():
             nonlocal date
-            date = cal.get_date()
+            date = date_entry.get_date()
             top.destroy()
 
         tk.Button(top, text="选择", command=on_select).pack(pady=20)
@@ -223,8 +223,8 @@ class ScheduleApp(tk.Tk):
             messagebox.showerror("错误", "请选择教师信息文件")
             return
 
-        start_date_str = self.start_date_entry.get().strip()
-        end_date_str = self.end_date_entry.get().strip()
+        start_date_str = self.start_date_entry.get_date().strftime('%Y-%m-%d')
+        end_date_str = self.end_date_entry.get_date().strftime('%Y-%m-%d')
 
         if not start_date_str or not end_date_str:
             messagebox.showerror("错误", "请输入起始日期和结束日期")
@@ -240,8 +240,8 @@ class ScheduleApp(tk.Tk):
         try:
             teachers = read_teachers(input_file)
             schedule, teacher_stats = generate_schedule(teachers, start_date, end_date, self.holidays, self.work_on_weekend)
-            schedule_output_file = "schedule_night.xlsx"
-            stats_output_file = "teacher_stats_night.xlsx"
+            schedule_output_file = "排班结果.xlsx"
+            stats_output_file = "排班统计信息.xlsx"
             write_schedule_to_excel(schedule, schedule_output_file)
             write_teacher_stats_to_excel(teacher_stats, stats_output_file)
             messagebox.showinfo("成功", "排班生成成功，文件已保存")
