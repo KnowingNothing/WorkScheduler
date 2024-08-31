@@ -52,8 +52,8 @@ def read_teachers(file_path):
           raise ValueError(f"输入表格第一列第一行需要以'姓名'二字开头，不要直接写人名")
         if '可值班日' not in row:
           raise ValueError(f"输入表格第二列第一行需要以'科值班日'二字开头，不要直接写日期")
-        name = row['姓名']
-        days = row['可值班日'].split('、')
+        name = row['姓名'].strip()
+        days = row['可值班日'].strip().split('、')
         teachers[name] = [weekday_map[day] for day in days]
     return teachers
 
