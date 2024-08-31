@@ -30,7 +30,8 @@ jobs:
         pip install tkcalendar pandas openpyxl babel  # 添加 babel 库的安装
 
     - name: Build executable
-      run: pyinstaller --onefile schedule_app.py
+      run: |
+        pyinstaller --onefile --debug --hidden-import=babel.numbers schedule_app.py
 
     - name: Upload artifact
       uses: actions/upload-artifact@v2
