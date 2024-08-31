@@ -27,14 +27,52 @@ jobs:
     - name: Install dependencies
       run: |
         pip install pyinstaller
-        pip install tkcalendar pandas openpyxl babel  # 添加 babel 库的安装
+        pip install pandas openpyxl
 
     - name: Build executable
-      run: |
-        pyinstaller --onefile --hidden-import=babel.numbers schedule_app.py
+      run: pyinstaller --onefile schedule_app.py
 
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
         name: schedule_app_${{ matrix.os }}
         path: dist/
+
+  generate_schedule:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: |
+        pip install pandas openpyxl
+
+    - name: Generate Schedule
+      run: |
+        python schedule_app.py --input-file ${{ inputs.teacher_info_file }} --start-date ${{ inputs.start_date }} --end-date ${{ inputs.end_date }} --holidays ${{ inputs.holidays }} --work-on-weekend ${{ inputs.work_on_weekend }}
+      env:
+        INPUT_FILE: ${{ inputs.teacher_info_file }}
+        START_DATE: ${{ inputs.start_date }}
+        END_DATE: ${{ inputs.end_date }}
+        HOLIDAYS: ${{ inputs.holidays }}
+        WORK_ON_WEEKEND: ${{ inputs.work_on_weekend }}
+
+    - name: Upload schedule artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: schedule_result
+        path: schedule_result.xlsx
+
+    - name: Upload teacher stats artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: teacher_stats
+        path: teacher_stats.xlsx
