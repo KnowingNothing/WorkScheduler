@@ -27,7 +27,7 @@ jobs:
     - name: Install dependencies
       run: |
         pip install pyinstaller
-        pip install tkcalendar pandas openpyxl
+        pip install tkcalendar pandas openpyxl babel  # 添加 babel 库的安装
 
     - name: Build executable
       run: pyinstaller --onefile schedule_app.py

@@ -1,9 +1,12 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from tkcalendar import DateEntry
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
 import pandas as pd
 from datetime import datetime, timedelta
 from collections import defaultdict
+import babel.numbers  # 确保导入 babel.numbers
 
 # 默认节假日列表
 default_holidays = {
@@ -104,62 +107,62 @@ def write_teacher_stats_to_excel(teacher_stats, output_file):
     df.to_excel(output_file, index=False)
 
 # Tkinter UI
-class ScheduleApp(tk.Tk):
+class ScheduleApp(ttk.Window):
     def __init__(self):
-        super().__init__()
+        super().__init__(themename="cosmo")
         self.title("排班生成器")
         self.geometry("600x600")
 
         self.holidays = set(default_holidays)
         self.work_on_weekend = set(default_work_on_weekend)
 
-        self.input_file_label = tk.Label(self, text="教师信息文件:")
-        self.input_file_label.pack()
+        self.input_file_label = ttk.Label(self, text="教师信息文件:")
+        self.input_file_label.pack(pady=5)
 
-        self.input_file_entry = tk.Entry(self, width=40)
-        self.input_file_entry.pack()
+        self.input_file_entry = ttk.Entry(self, width=40)
+        self.input_file_entry.pack(pady=5)
 
-        self.browse_button = tk.Button(self, text="浏览", command=self.browse_file)
-        self.browse_button.pack()
+        self.browse_button = ttk.Button(self, text="浏览", command=self.browse_file)
+        self.browse_button.pack(pady=5)
 
-        self.start_date_label = tk.Label(self, text="起始日期:")
-        self.start_date_label.pack()
+        self.start_date_label = ttk.Label(self, text="起始日期:")
+        self.start_date_label.pack(pady=5)
 
         self.start_date_entry = DateEntry(self, width=40, date_pattern='yyyy-mm-dd')
-        self.start_date_entry.pack()
+        self.start_date_entry.pack(pady=5)
 
-        self.end_date_label = tk.Label(self, text="结束日期:")
-        self.end_date_label.pack()
+        self.end_date_label = ttk.Label(self, text="结束日期:")
+        self.end_date_label.pack(pady=5)
 
         self.end_date_entry = DateEntry(self, width=40, date_pattern='yyyy-mm-dd')
-        self.end_date_entry.pack()
+        self.end_date_entry.pack(pady=5)
 
-        self.holidays_label = tk.Label(self, text="节假日:")
-        self.holidays_label.pack()
+        self.holidays_label = ttk.Label(self, text="节假日:")
+        self.holidays_label.pack(pady=5)
 
         self.holidays_listbox = tk.Listbox(self, width=40, height=10)
-        self.holidays_listbox.pack()
+        self.holidays_listbox.pack(pady=5)
 
-        self.add_holiday_button = tk.Button(self, text="添加节假日", command=self.add_holiday)
-        self.add_holiday_button.pack()
+        self.add_holiday_button = ttk.Button(self, text="添加节假日", command=self.add_holiday)
+        self.add_holiday_button.pack(pady=5)
 
-        self.remove_holiday_button = tk.Button(self, text="移除节假日", command=self.remove_holiday)
-        self.remove_holiday_button.pack()
+        self.remove_holiday_button = ttk.Button(self, text="移除节假日", command=self.remove_holiday)
+        self.remove_holiday_button.pack(pady=5)
 
-        self.work_on_weekend_label = tk.Label(self, text="调休日:")
-        self.work_on_weekend_label.pack()
+        self.work_on_weekend_label = ttk.Label(self, text="调休日:")
+        self.work_on_weekend_label.pack(pady=5)
 
         self.work_on_weekend_listbox = tk.Listbox(self, width=40, height=10)
-        self.work_on_weekend_listbox.pack()
+        self.work_on_weekend_listbox.pack(pady=5)
 
-        self.add_work_on_weekend_button = tk.Button(self, text="添加调休日", command=self.add_work_on_weekend)
-        self.add_work_on_weekend_button.pack()
+        self.add_work_on_weekend_button = ttk.Button(self, text="添加调休日", command=self.add_work_on_weekend)
+        self.add_work_on_weekend_button.pack(pady=5)
 
-        self.remove_work_on_weekend_button = tk.Button(self, text="移除调休日", command=self.remove_work_on_weekend)
-        self.remove_work_on_weekend_button.pack()
+        self.remove_work_on_weekend_button = ttk.Button(self, text="移除调休日", command=self.remove_work_on_weekend)
+        self.remove_work_on_weekend_button.pack(pady=5)
 
-        self.generate_button = tk.Button(self, text="生成排班", command=self.generate_schedule)
-        self.generate_button.pack()
+        self.generate_button = ttk.Button(self, text="生成排班", command=self.generate_schedule)
+        self.generate_button.pack(pady=20)
 
         self.update_listboxes()
 
@@ -193,7 +196,7 @@ class ScheduleApp(tk.Tk):
             self.update_listboxes()
 
     def select_date(self, title):
-        top = tk.Toplevel(self)
+        top = ttk.Toplevel(self)
         top.title(title)
         date_entry = DateEntry(top, width=20, date_pattern='yyyy-mm-dd')
         date_entry.pack(pady=20)
@@ -204,7 +207,7 @@ class ScheduleApp(tk.Tk):
             date = date_entry.get_date()
             top.destroy()
 
-        tk.Button(top, text="选择", command=on_select).pack(pady=20)
+        ttk.Button(top, text="选择", command=on_select).pack(pady=20)
         top.wait_window(top)
         return date
 
