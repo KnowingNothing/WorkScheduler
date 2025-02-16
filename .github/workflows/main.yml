@@ -28,21 +28,24 @@ jobs:
       run: |
         pip install pyinstaller
         pip install pandas openpyxl
+        pip install PyQt6
 
     - name: Build executable for schedule_app.py
-      run: pyinstaller --onefile schedule_app.py
+      run: |
+        pyinstaller --onefile schedule_app.py
 
     - name: Upload schedule_app artifact
-      uses: actions/upload-artifact@v4  # 升级到 v4 版本
+      uses: actions/upload-artifact@v4
       with:
         name: schedule_app_${{ matrix.os }}
         path: dist/schedule_app.exe  # 对于 macOS 会是 dist/schedule_app，Windows 是 .exe
 
     - name: Build executable for schedule_2025_h1.py
-      run: pyinstaller --onefile schedule_2025_h1.py
+      run: |
+        pyinstaller --onefile --hidden-import=PyQt6.QtCore --hidden-import=PyQt6.QtGui --hidden-import=PyQt6.QtWidgets schedule_2025_h1.py
 
     - name: Upload schedule_2025_h1 artifact
-      uses: actions/upload-artifact@v4  # 升级到 v4 版本
+      uses: actions/upload-artifact@v4
       with:
         name: schedule_2025_h1_${{ matrix.os }}
         path: dist/schedule_2025_h1.exe  # 对于 macOS 会是 dist/schedule_2025_h1，Windows 是 .exe
